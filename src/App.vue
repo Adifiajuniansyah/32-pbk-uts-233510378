@@ -26,13 +26,24 @@ const addActivity = () => {
     }, 3000)
   }
 }
+
+// Fungsi untuk menghapus (membatalkan) kegiatan
+const removeActivity = (index) => {
+  const removed = activities.value.splice(index, 1)
+  message.value = `Kegiatan "${removed[0]}" telah dibatalkan.`
+
+  // Menghapus pesan setelah 3 detik
+  setTimeout(() => {
+    message.value = ''
+  }, 3000)
+}
 </script>
 
 <template>
   <div class="container">
     <h1>Daftar Kegiatan</h1>
 
-    <!-- Notifikasi Tambah -->
+    <!-- Notifikasi -->
     <p v-if="message" class="message">{{ message }}</p>
 
     <!-- Form Tambah Kegiatan -->
@@ -48,8 +59,9 @@ const addActivity = () => {
 
     <!-- Daftar Kegiatan -->
     <ul>
-      <li v-for="(activity, index) in activities" :key="index">
+      <li v-for="(activity, index) in activities" :key="index" class="activity-item">
         {{ activity }}
+        <button class="delete-button" @click="removeActivity(index)">Hapus</button>
       </li>
     </ul>
   </div>
@@ -100,8 +112,21 @@ ul {
   padding-left: 1.2em;
 }
 
-li {
+.activity-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin: 0.5em 0;
   list-style: disc;
+}
+
+.delete-button {
+  background-color: #ffcccc;
+  border: none;
+  padding: 0.3em 0.6em;
+  border-radius: 4px;
+  color: #a00000;
+  cursor: pointer;
+  font-size: 0.9em;
 }
 </style>
