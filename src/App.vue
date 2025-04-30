@@ -9,14 +9,21 @@ const activities = ref([
   'Membaca buku'
 ])
 
-// State untuk input kegiatan baru
+// State untuk input kegiatan baru dan pesan notifikasi
 const newActivity = ref('')
+const message = ref('')
 
 // Fungsi untuk menambahkan kegiatan baru
 const addActivity = () => {
   if (newActivity.value.trim() !== '') {
     activities.value.push(newActivity.value)
+    message.value = `Kegiatan "${newActivity.value}" berhasil ditambahkan.`
     newActivity.value = ''
+
+    // Menghapus pesan setelah 3 detik
+    setTimeout(() => {
+      message.value = ''
+    }, 3000)
   }
 }
 </script>
@@ -24,6 +31,9 @@ const addActivity = () => {
 <template>
   <div class="container">
     <h1>Daftar Kegiatan</h1>
+
+    <!-- Notifikasi Tambah -->
+    <p v-if="message" class="message">{{ message }}</p>
 
     <!-- Form Tambah Kegiatan -->
     <div class="form">
@@ -56,6 +66,16 @@ const addActivity = () => {
 h1 {
   text-align: center;
   margin-bottom: 1em;
+}
+
+.message {
+  background-color: #e0ffe0;
+  border: 1px solid #00cc00;
+  padding: 0.5em;
+  margin-bottom: 1em;
+  color: #006600;
+  border-radius: 4px;
+  text-align: center;
 }
 
 .form {
