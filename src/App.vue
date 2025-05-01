@@ -1,44 +1,67 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 
-// State daftar kegiatan (pakai objek agar bisa tandai selesai)
-const activities = ref([
-  { text: 'Belajar Vue.js', completed: false },
-  { text: 'Mengerjakan tugas kuliah', completed: false },
-  { text: 'Olahraga sore', completed: false },
-  { text: 'Membaca buku', completed: false }
-])
-
+// State utama
+const activities = ref([])
 const newActivity = ref('')
 const message = ref('')
+const showOnlyIncomplete = ref(false)
 
-// Fungsi untuk menambahkan kegiatan baru
+// Fungsi untuk memuat dari localStorage saat app dimuat
+onMounted(() => {
+  const saved = localStorage.getItem('activities')
+  if (saved) {
+    activities.value = JSON.parse(saved)
+  } else {
+    // Default data jika belum ada di localStorage
+    activities.value = [
+      { text: 'Belajar Vue.js', completed: false },
+      { text: 'Mengerjakan tugas kuliah', completed: false },
+      { text: 'Olahraga sore', completed: false },
+      { text: 'Membaca buku', completed: false }
+    ]
+  }
+})
+
+// Simpan ke localStorage setiap kali `activities` berubah
+watch(activities, (newVal) => {
+  localStorage.setItem('activities', JSON.stringify(newVal))
+}, { deep: true })
+
+// Tambah kegiatan
 const addActivity = () => {
   if (newActivity.value.trim() !== '') {
     activities.value.push({ text: newActivity.value, completed: false })
     message.value = `Kegiatan "${newActivity.value}" berhasil ditambahkan.`
     newActivity.value = ''
 
-    setTimeout(() => {
-      message.value = ''
-    }, 3000)
+    setTimeout(() => { message.value = '' }, 3000)
   }
 }
 
-// Fungsi untuk menghapus kegiatan
+// Hapus kegiatan
 const removeActivity = (index) => {
-  const removed = activities.value.splice(index, 1)
-  message.value = `Kegiatan "${removed[0].text}" telah dibatalkan.`
+  const removed = filteredActivities.value[index]
+  const originalIndex = activities.value.indexOf(removed)
+  activities.value.splice(originalIndex, 1)
+  message.value = `Kegiatan "${removed.text}" telah dibatalkan.`
 
-  setTimeout(() => {
-    message.value = ''
-  }, 3000)
+  setTimeout(() => { message.value = '' }, 3000)
 }
 
-// Fungsi untuk toggle selesai/tidak
+// Tandai selesai / belum selesai
 const toggleCompleted = (index) => {
-  activities.value[index].completed = !activities.value[index].completed
+  const item = filteredActivities.value[index]
+  const originalIndex = activities.value.indexOf(item)
+  activities.value[originalIndex].completed = !activities.value[originalIndex].completed
 }
+
+// Filter kegiatan
+const filteredActivities = computed(() => {
+  return showOnlyIncomplete.value
+    ? activities.value.filter(activity => !activity.completed)
+    : activities.value
+})
 </script>
 
 <template>
@@ -59,9 +82,17 @@ const toggleCompleted = (index) => {
       <button @click="addActivity">Tambah</button>
     </div>
 
+    <!-- Filter Kegiatan -->
+    <div class="filter">
+      <label>
+        <input type="checkbox" v-model="showOnlyIncomplete" />
+        Tampilkan hanya yang belum selesai
+      </label>
+    </div>
+
     <!-- Daftar Kegiatan -->
     <ul>
-      <li v-for="(activity, index) in activities" :key="index" class="activity-item">
+      <li v-for="(activity, index) in filteredActivities" :key="index" class="activity-item">
         <span
           @click="toggleCompleted(index)"
           :class="{ completed: activity.completed }"
@@ -101,10 +132,10 @@ h1 {
 .form {
   display: flex;
   gap: 0.5em;
-  margin-bottom: 1.5em;
+  margin-bottom: 1em;
 }
 
-input {
+input[type="text"] {
   flex: 1;
   padding: 0.5em;
   font-size: 1em;
@@ -114,6 +145,11 @@ button {
   padding: 0.5em 1em;
   font-size: 1em;
   cursor: pointer;
+}
+
+.filter {
+  margin-bottom: 1.5em;
+  text-align: center;
 }
 
 ul {
