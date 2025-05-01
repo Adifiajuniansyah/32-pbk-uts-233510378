@@ -1,41 +1,43 @@
 <script setup>
 import { ref } from 'vue'
 
-// State daftar kegiatan
+// State daftar kegiatan (pakai objek agar bisa tandai selesai)
 const activities = ref([
-  'Belajar Vue.js',
-  'Mengerjakan tugas kuliah',
-  'Olahraga sore',
-  'Membaca buku'
+  { text: 'Belajar Vue.js', completed: false },
+  { text: 'Mengerjakan tugas kuliah', completed: false },
+  { text: 'Olahraga sore', completed: false },
+  { text: 'Membaca buku', completed: false }
 ])
 
-// State untuk input kegiatan baru dan pesan notifikasi
 const newActivity = ref('')
 const message = ref('')
 
 // Fungsi untuk menambahkan kegiatan baru
 const addActivity = () => {
   if (newActivity.value.trim() !== '') {
-    activities.value.push(newActivity.value)
+    activities.value.push({ text: newActivity.value, completed: false })
     message.value = `Kegiatan "${newActivity.value}" berhasil ditambahkan.`
     newActivity.value = ''
 
-    // Menghapus pesan setelah 3 detik
     setTimeout(() => {
       message.value = ''
     }, 3000)
   }
 }
 
-// Fungsi untuk menghapus (membatalkan) kegiatan
+// Fungsi untuk menghapus kegiatan
 const removeActivity = (index) => {
   const removed = activities.value.splice(index, 1)
-  message.value = `Kegiatan "${removed[0]}" telah dibatalkan.`
+  message.value = `Kegiatan "${removed[0].text}" telah dibatalkan.`
 
-  // Menghapus pesan setelah 3 detik
   setTimeout(() => {
     message.value = ''
   }, 3000)
+}
+
+// Fungsi untuk toggle selesai/tidak
+const toggleCompleted = (index) => {
+  activities.value[index].completed = !activities.value[index].completed
 }
 </script>
 
@@ -60,7 +62,13 @@ const removeActivity = (index) => {
     <!-- Daftar Kegiatan -->
     <ul>
       <li v-for="(activity, index) in activities" :key="index" class="activity-item">
-        {{ activity }}
+        <span
+          @click="toggleCompleted(index)"
+          :class="{ completed: activity.completed }"
+          class="activity-text"
+        >
+          {{ activity.text }}
+        </span>
         <button class="delete-button" @click="removeActivity(index)">Hapus</button>
       </li>
     </ul>
@@ -118,6 +126,16 @@ ul {
   align-items: center;
   margin: 0.5em 0;
   list-style: disc;
+}
+
+.activity-text {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.activity-text.completed {
+  text-decoration: line-through;
+  color: #888;
 }
 
 .delete-button {
