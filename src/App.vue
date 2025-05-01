@@ -7,13 +7,12 @@ const newActivity = ref('')
 const message = ref('')
 const showOnlyIncomplete = ref(false)
 
-// Fungsi untuk memuat dari localStorage saat app dimuat
+// Memuat data dari localStorage
 onMounted(() => {
   const saved = localStorage.getItem('activities')
   if (saved) {
     activities.value = JSON.parse(saved)
   } else {
-    // Default data jika belum ada di localStorage
     activities.value = [
       { text: 'Belajar Vue.js', completed: false },
       { text: 'Mengerjakan tugas kuliah', completed: false },
@@ -68,10 +67,8 @@ const filteredActivities = computed(() => {
   <div class="container">
     <h1>Daftar Kegiatan</h1>
 
-    <!-- Notifikasi -->
     <p v-if="message" class="message">{{ message }}</p>
 
-    <!-- Form Tambah Kegiatan -->
     <div class="form">
       <input
         type="text"
@@ -82,7 +79,6 @@ const filteredActivities = computed(() => {
       <button @click="addActivity">Tambah</button>
     </div>
 
-    <!-- Filter Kegiatan -->
     <div class="filter">
       <label>
         <input type="checkbox" v-model="showOnlyIncomplete" />
@@ -90,7 +86,6 @@ const filteredActivities = computed(() => {
       </label>
     </div>
 
-    <!-- Daftar Kegiatan -->
     <ul>
       <li v-for="(activity, index) in filteredActivities" :key="index" class="activity-item">
         <span
@@ -107,80 +102,133 @@ const filteredActivities = computed(() => {
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f4f7fa;
+}
+
 .container {
   max-width: 600px;
-  margin: auto;
+  margin: 3em auto;
   padding: 2em;
-  font-family: Arial, sans-serif;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
   text-align: center;
+  color: #333;
   margin-bottom: 1em;
 }
 
 .message {
-  background-color: #e0ffe0;
-  border: 1px solid #00cc00;
-  padding: 0.5em;
+  background-color: #d1fae5;
+  border: 1px solid #10b981;
+  padding: 0.75em;
   margin-bottom: 1em;
-  color: #006600;
-  border-radius: 4px;
+  color: #065f46;
+  border-radius: 6px;
   text-align: center;
+  font-weight: 500;
 }
 
 .form {
   display: flex;
-  gap: 0.5em;
-  margin-bottom: 1em;
+  gap: 0.75em;
+  margin-bottom: 1.5em;
 }
 
 input[type="text"] {
   flex: 1;
-  padding: 0.5em;
+  padding: 0.75em;
   font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  transition: 0.3s ease;
+}
+
+input[type="text"]:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 button {
-  padding: 0.5em 1em;
-  font-size: 1em;
+  padding: 0.75em 1.2em;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
   cursor: pointer;
+  transition: 0.3s ease;
+}
+
+button:hover {
+  background-color: #2563eb;
 }
 
 .filter {
   margin-bottom: 1.5em;
   text-align: center;
+  color: #555;
+  font-size: 0.95em;
 }
 
 ul {
-  padding-left: 1.2em;
+  padding: 0;
+  margin: 0;
+  list-style: none;
 }
 
 .activity-item {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75em 1em;
+  margin-bottom: 0.75em;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0.5em 0;
-  list-style: disc;
+  transition: background-color 0.3s;
+}
+
+.activity-item:hover {
+  background-color: #f3f4f6;
 }
 
 .activity-text {
   cursor: pointer;
-  transition: all 0.2s;
+  font-size: 1em;
+  transition: all 0.3s;
 }
 
 .activity-text.completed {
   text-decoration: line-through;
-  color: #888;
+  color: #9ca3af;
 }
 
 .delete-button {
-  background-color: #ffcccc;
+  background-color: #fecaca;
+  color: #b91c1c;
   border: none;
-  padding: 0.3em 0.6em;
-  border-radius: 4px;
-  color: #a00000;
+  padding: 0.4em 0.8em;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9em;
+  font-size: 0.85em;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.delete-button:hover {
+  background-color: #f87171;
+  color: white;
 }
 </style>
